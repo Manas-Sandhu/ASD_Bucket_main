@@ -1,15 +1,15 @@
 const express = require('express')
-const controller = require('../controllers/productController')
-const { checkCache, clearCache } = require('../middleware/cache')
+const handlers = require('../controllers/productController')
+const { useCache, resetCache } = require('../middleware/cache')
 
-const router = express.Router()
+const routes = express.Router()
 
-router.get('/', checkCache, controller.getAllProducts)
-router.get('/:id', checkCache, controller.getProductById)
+routes.get('/', useCache, handlers.getAll)
+routes.get('/:id', useCache, handlers.getOne)
 
-router.post('/', clearCache, controller.addProduct)
-router.put('/:id', clearCache, controller.updateProduct)
-router.patch('/:id', clearCache, controller.patchProduct)
-router.delete('/:id', clearCache, controller.deleteProduct)
+routes.post('/', resetCache, handlers.create)
+routes.put('/:id', resetCache, handlers.replace)
+routes.patch('/:id', resetCache, handlers.edit)
+routes.delete('/:id', resetCache, handlers.remove)
 
-module.exports = router
+module.exports = routes

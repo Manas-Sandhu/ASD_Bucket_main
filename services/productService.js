@@ -1,76 +1,76 @@
-const db = require('../database/db')
+const storage = require('../database/db')
 
-async function getAllProducts() {
-    return await db.getProducts()
+async function getAll() {
+    return await storage.readAll()
 }
 
-async function getProductById(id) {
-    const products = await db.getProducts()
-    const found = products.find((item) => item.id === id)
-    return found || null
+async function getOne(productId) {
+    const list = await storage.readAll()
+    const match = list.find((p) => p.id === productId)
+    return match || null
 }
 
-async function addProduct(name, price) {
-    const products = await db.getProducts()
+async function create(newName, newPrice) {
+    const list = await storage.readAll()
 
-    let newId = 1
-    if (products.length > 0) {
-        newId = Math.max(...products.map((item) => item.id)) + 1
+    let nextId = 1
+    if (list.length > 0) {
+        nextId = Math.max(...list.map((p) => p.id)) + 1
     }
 
-    const newProduct = { id: newId, name: name, price: price }
-    products.push(newProduct)
-    await db.saveProducts(products)
-    return newProduct
+    const created = { id: nextId, name: newName, price: newPrice }
+    list.push(created)
+    await storage.saveAll(list)
+    return created
 }
 
-async function updateProduct(id, name, price) {
-    const products = await db.getProducts()
-    const index = products.findIndex((item) => item.id === id)
-    if (index === -1) {
+async function replace(productId, newName, newPrice) {
+    const list = await storage.readAll()
+    const pos = list.findIndex((p) => p.id === productId)
+    if (pos === -1) {
         return null
     }
 
-    products[index] = { id: id, name: name, price: price }
-    await db.saveProducts(products)
-    return products[index]
+    list[pos] = { id: productId, name: newName, price: newPrice }
+    await storage.saveAll(list)
+    return list[pos]
 }
 
-async function patchProduct(id, name, price) {
-    const products = await db.getProducts()
-    const index = products.findIndex((item) => item.id === id)
-    if (index === -1) {
+async function edit(productId, newName, newPrice) {
+    const list = await storage.readAll()
+    const pos = list.findIndex((p) => p.id === productId)
+    if (pos === -1) {
         return null
     }
 
-    if (name !== undefined) {
-        products[index].name = name
+    if (newName !== undefined) {
+        list[pos].name = newName
     }
-    if (price !== undefined) {
-        products[index].price = price
+    if (newPrice !== undefined) {
+        list[pos].price = newPrice
     }
 
-    await db.saveProducts(products)
-    return products[index]
+    await storage.saveAll(list)
+    return list[pos]
 }
 
-async function deleteProduct(id) {
-    const products = await db.getProducts()
-    const index = products.findIndex((item) => item.id === id)
-    if (index === -1) {
+async function remove(productId) {
+    const list = await storage.readAll()
+    const pos = list.findIndex((p) => p.id === productId)
+    if (pos === -1) {
         return false
     }
 
-    products.splice(index, 1)
-    await db.saveProducts(products)
+    list.splice(pos, 1)
+    await storage.saveAll(list)
     return true
 }
 
 module.exports = {
-    getAllProducts,
-    getProductById,
-    addProduct,
-    updateProduct,
-    patchProduct,
-    deleteProduct
+    getAll,
+    getOne,
+    create,
+    replace,
+    edit,
+    remove
 }

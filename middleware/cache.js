@@ -1,44 +1,44 @@
-const ONE_MINUTE = 60 * 1000
+const CACHE_TIME = 60 * 1000
 
-let cache = {}
-let version = 0
+let store = {}
+let changes = 0
 
-function checkCache(req, res, next) {
-    const key = req.originalUrl
-    const saved = cache[key]
+function useCache(req, res, next) {
+    const url = req.originalUrl
+    const hit = store[url]
 
-    if (saved && Date.now() - saved.time < ONE_MINUTE) {
+    if (hit && Date.now() - hit.savedAt < CACHE_TIME) {
         res.set('X-Cache', 'HIT')
-        return res.status(200).json(saved.data)
+        return res.status(200).json(hit.body)
     }
 
-    if (saved) {
-        delete cache[key]
+    if (hit) {
+        delete store[url]
     }
 
     res.set('X-Cache', 'MISS')
 
-    const startVersion = version
-    const sendJson = res.json.bind(res)
+    const before = changes
+    const originalSend = res.json.bind(res)
 
-    res.json = (data) => {
-        if (res.statusCode === 200 && startVersion === version) {
-            cache[key] = { data: data, time: Date.now() }
+    res.json = (body) => {
+        if (res.statusCode === 200 && before === changes) {
+            store[url] = { body: body, savedAt: Date.now() }
         }
-        return sendJson(data)
+        return originalSend(body)
     }
 
     next()
 }
 
-function clearCache(req, res, next) {
+function resetCache(req, res, next) {
     res.on('finish', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
-            version++
-            cache = {}
+            changes++
+            store = {}
         }
     })
     next()
 }
 
-module.exports = { checkCache, clearCache }
+module.exports = { useCache, resetCache }

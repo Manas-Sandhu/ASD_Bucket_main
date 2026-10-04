@@ -1,49 +1,49 @@
-const productService = require('../services/productService')
+const service = require('../services/productService')
 
-async function getAllProducts(req, res) {
+async function getAll(req, res) {
     try {
-        const products = await productService.getAllProducts()
-        res.json(products)
-    } catch (err) {
+        const list = await service.getAll()
+        res.json(list)
+    } catch (error) {
         res.status(500).json({ error: 'Error in reading file' })
     }
 }
 
-async function getProductById(req, res) {
+async function getOne(req, res) {
     try {
-        const id = Number(req.params.id)
-        if (Number.isNaN(id)) {
+        const productId = Number(req.params.id)
+        if (Number.isNaN(productId)) {
             return res.status(400).json({ error: 'Invalid id' })
         }
 
-        const product = await productService.getProductById(id)
-        if (!product) {
+        const item = await service.getOne(productId)
+        if (!item) {
             return res.status(404).json({ error: 'Element not found' })
         }
-        res.json(product)
-    } catch (err) {
+        res.json(item)
+    } catch (error) {
         res.status(500).json({ error: 'Error in reading file' })
     }
 }
 
-async function addProduct(req, res) {
+async function create(req, res) {
     try {
         const { name, price } = req.body
         if (!name || price === undefined) {
             return res.status(400).json({ error: 'name and price are required' })
         }
 
-        const newProduct = await productService.addProduct(name, price)
-        res.status(201).json(newProduct)
-    } catch (err) {
+        const created = await service.create(name, price)
+        res.status(201).json(created)
+    } catch (error) {
         res.status(500).json({ error: 'Error in writing file' })
     }
 }
 
-async function updateProduct(req, res) {
+async function replace(req, res) {
     try {
-        const id = Number(req.params.id)
-        if (Number.isNaN(id)) {
+        const productId = Number(req.params.id)
+        if (Number.isNaN(productId)) {
             return res.status(400).json({ error: 'Invalid id' })
         }
 
@@ -52,20 +52,20 @@ async function updateProduct(req, res) {
             return res.status(400).json({ error: 'name and price are required' })
         }
 
-        const product = await productService.updateProduct(id, name, price)
-        if (!product) {
+        const item = await service.replace(productId, name, price)
+        if (!item) {
             return res.status(404).json({ error: 'Element not found' })
         }
-        res.json(product)
-    } catch (err) {
+        res.json(item)
+    } catch (error) {
         res.status(500).json({ error: 'Error in writing file' })
     }
 }
 
-async function patchProduct(req, res) {
+async function edit(req, res) {
     try {
-        const id = Number(req.params.id)
-        if (Number.isNaN(id)) {
+        const productId = Number(req.params.id)
+        if (Number.isNaN(productId)) {
             return res.status(400).json({ error: 'Invalid id' })
         }
 
@@ -74,38 +74,38 @@ async function patchProduct(req, res) {
             return res.status(400).json({ error: 'Provide name or price' })
         }
 
-        const product = await productService.patchProduct(id, name, price)
-        if (!product) {
+        const item = await service.edit(productId, name, price)
+        if (!item) {
             return res.status(404).json({ error: 'Element not found' })
         }
-        res.json(product)
-    } catch (err) {
+        res.json(item)
+    } catch (error) {
         res.status(500).json({ error: 'Error in writing file' })
     }
 }
 
-async function deleteProduct(req, res) {
+async function remove(req, res) {
     try {
-        const id = Number(req.params.id)
-        if (Number.isNaN(id)) {
+        const productId = Number(req.params.id)
+        if (Number.isNaN(productId)) {
             return res.status(400).json({ error: 'Invalid id' })
         }
 
-        const isDeleted = await productService.deleteProduct(id)
-        if (!isDeleted) {
+        const removed = await service.remove(productId)
+        if (!removed) {
             return res.status(404).json({ error: 'Element not found' })
         }
         res.json({ message: 'Deleted' })
-    } catch (err) {
+    } catch (error) {
         res.status(500).json({ error: 'Error in writing file' })
     }
 }
 
 module.exports = {
-    getAllProducts,
-    getProductById,
-    addProduct,
-    updateProduct,
-    patchProduct,
-    deleteProduct
+    getAll,
+    getOne,
+    create,
+    replace,
+    edit,
+    remove
 }
