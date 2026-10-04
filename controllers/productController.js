@@ -1,22 +1,22 @@
 const service = require('../services/productService')
 
-async function getAll(req, res) {
+async function getAllProducts(req, res) {
     try {
-        const list = await service.getAll()
+        const list = await service.getAllProducts()
         res.json(list)
     } catch (error) {
         res.status(500).json({ error: 'Error in reading file' })
     }
 }
 
-async function getOne(req, res) {
+async function getProductById(req, res) {
     try {
         const productId = Number(req.params.id)
         if (Number.isNaN(productId)) {
             return res.status(400).json({ error: 'Invalid id' })
         }
 
-        const item = await service.getOne(productId)
+        const item = await service.getProductById(productId)
         if (!item) {
             return res.status(404).json({ error: 'Element not found' })
         }
@@ -26,21 +26,21 @@ async function getOne(req, res) {
     }
 }
 
-async function create(req, res) {
+async function addProduct(req, res) {
     try {
         const { name, price } = req.body
         if (!name || price === undefined) {
             return res.status(400).json({ error: 'name and price are required' })
         }
 
-        const created = await service.create(name, price)
+        const created = await service.addProduct(name, price)
         res.status(201).json(created)
     } catch (error) {
         res.status(500).json({ error: 'Error in writing file' })
     }
 }
 
-async function replace(req, res) {
+async function updateProduct(req, res) {
     try {
         const productId = Number(req.params.id)
         if (Number.isNaN(productId)) {
@@ -52,7 +52,7 @@ async function replace(req, res) {
             return res.status(400).json({ error: 'name and price are required' })
         }
 
-        const item = await service.replace(productId, name, price)
+        const item = await service.updateProduct(productId, name, price)
         if (!item) {
             return res.status(404).json({ error: 'Element not found' })
         }
@@ -62,7 +62,7 @@ async function replace(req, res) {
     }
 }
 
-async function edit(req, res) {
+async function patchProduct(req, res) {
     try {
         const productId = Number(req.params.id)
         if (Number.isNaN(productId)) {
@@ -74,7 +74,7 @@ async function edit(req, res) {
             return res.status(400).json({ error: 'Provide name or price' })
         }
 
-        const item = await service.edit(productId, name, price)
+        const item = await service.patchProduct(productId, name, price)
         if (!item) {
             return res.status(404).json({ error: 'Element not found' })
         }
@@ -84,14 +84,14 @@ async function edit(req, res) {
     }
 }
 
-async function remove(req, res) {
+async function deleteProduct(req, res) {
     try {
         const productId = Number(req.params.id)
         if (Number.isNaN(productId)) {
             return res.status(400).json({ error: 'Invalid id' })
         }
 
-        const removed = await service.remove(productId)
+        const removed = await service.deleteProduct(productId)
         if (!removed) {
             return res.status(404).json({ error: 'Element not found' })
         }
@@ -102,10 +102,10 @@ async function remove(req, res) {
 }
 
 module.exports = {
-    getAll,
-    getOne,
-    create,
-    replace,
-    edit,
-    remove
+    getAllProducts,
+    getProductById,
+    addProduct,
+    updateProduct,
+    patchProduct,
+    deleteProduct
 }

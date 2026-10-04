@@ -3,7 +3,7 @@ const CACHE_TIME = 60 * 1000
 let store = {}
 let changes = 0
 
-function useCache(req, res, next) {
+function checkCache(req, res, next) {
     const url = req.originalUrl
     const hit = store[url]
 
@@ -31,7 +31,7 @@ function useCache(req, res, next) {
     next()
 }
 
-function resetCache(req, res, next) {
+function clearCache(req, res, next) {
     res.on('finish', () => {
         if (res.statusCode >= 200 && res.statusCode < 300) {
             changes++
@@ -41,4 +41,4 @@ function resetCache(req, res, next) {
     next()
 }
 
-module.exports = { useCache, resetCache }
+module.exports = { checkCache, clearCache }
